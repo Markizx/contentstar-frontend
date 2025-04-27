@@ -1,7 +1,8 @@
+// frontend/utils/getSecrets.js
 import AWS from 'aws-sdk';
 
 const secretsManager = new AWS.SecretsManager({
-  region: 'ap-southeast-2', // Обновляем регион на Sydney
+  region: 'ap-southeast-2',
 });
 
 let cachedSecrets = null;

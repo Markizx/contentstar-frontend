@@ -12,7 +12,7 @@ export default async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: 'price_1N...',
+          price: 'price_1N...', // Укажи ID цены из Stripe
           quantity: 1,
         },
       ],

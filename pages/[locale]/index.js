@@ -46,7 +46,6 @@ export default function Home({ initialLocale }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-blue to-blue-600 text-white font-inter">
       <div className="flex">
-        {/* Боковая панель */}
         <div className="w-64 bg-gray-900/30 backdrop-blur-lg p-6 fixed h-full">
           <h1 className="text-3xl font-poppins font-bold mb-8">{t('title')}</h1>
           <p className="mb-4">Locale: {currentLocale}</p>
@@ -64,7 +63,6 @@ export default function Home({ initialLocale }) {
           </select>
         </div>
 
-        {/* Основной контент */}
         <div className="ml-64 p-6 w-full">
           {status === 'loading' ? (
             <p className="text-center">Loading...</p>
