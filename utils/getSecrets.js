@@ -1,6 +1,6 @@
-import AWS from 'aws-sdk';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
-const secretsManager = new AWS.SecretsManager({
+const secretsManager = new SecretsManagerClient({
   region: 'ap-southeast-2',
 });
 
@@ -20,13 +20,14 @@ export async function getSecrets() {
   }
 
   try {
-    const data = await secretsManager
-      .getSecretValue({ SecretId: process.env.SECRETS_MANAGER_SECRET_NAME })
-      .promise();
+    const command = new GetSecretValueCommand({
+      SecretId: process.env.SECRETS_MANAGER_SECRET_NAME,
+    });
+    const data = await secretsManager.send(command);
 
     console.log('Secrets Manager response:', data);
 
-    if ('SecretString' in data) {
+    if (data.SecretString) {
       cachedSecrets = JSON.parse(data.SecretString);
       console.log('Parsed secrets:', cachedSecrets);
       return cachedSecrets;
