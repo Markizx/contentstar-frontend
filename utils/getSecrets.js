@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 
 const secretsManager = new AWS.SecretsManager({
-  region: 'YOUR_REGION', // Например, 'us-east-1'
+  region: 'ap-southeast-2', // Обновляем регион на Sydney
 });
 
 let cachedSecrets = null;
