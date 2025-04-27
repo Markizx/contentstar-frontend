@@ -14,18 +14,20 @@
     "cloudinary": "^1.41.3",
     "framer-motion": "^11.18.2",
     "i18next": "^23.11.2",
+    "i18next-browser-languagedetector": "^8.0.5",
+    "lightningcss": "^1.29.3",
     "next": "15.3.1",
     "next-auth": "^4.24.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^14.1.0",
-    "stripe": "^14.25.0"
+    "stripe": "^14.25.0",
+    "tailwindcss": "^3.3.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
-    "eslint-config-next": "15.3.1",
-    "tailwindcss": "^4"
+    "eslint-config-next": "15.3.1"
   }
 }

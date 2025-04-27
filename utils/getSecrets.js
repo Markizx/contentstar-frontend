@@ -1,4 +1,3 @@
-// frontend/utils/getSecrets.js
 import AWS from 'aws-sdk';
 
 const secretsManager = new AWS.SecretsManager({

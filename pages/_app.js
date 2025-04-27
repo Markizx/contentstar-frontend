@@ -1,6 +1,7 @@
 import '../i18n';
 import { SessionProvider } from 'next-auth/react';
 import i18n from 'i18next';
+import '../styles/global.css';
 
 export default function App({ Component, pageProps }) {
   const { session, initialLocale, ...restPageProps } = pageProps || {};

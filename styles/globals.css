@@ -1,17 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Poppins:wght@700&display=swap');
-
-:root {
-  --dark-blue: #1E3A8A;
-  --blue-600: #3B82F6;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 body {
-  margin: 0;
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(to bottom right, var(--dark-blue), var(--blue-600));
-  color: white;
-}
-
-h1, h2 {
-  font-family: 'Poppins', sans-serif;
 }

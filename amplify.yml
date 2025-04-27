@@ -5,8 +5,6 @@ frontend:
       commands:
         - npm ci
         - echo "SECRETS_MANAGER_SECRET_NAME=$SECRETS_MANAGER_SECRET_NAME"
-        - echo "Current directory contents:"
-        - ls -la
     build:
       commands:
         - npm run build
@@ -17,5 +15,3 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
-  environment:
-    SECRETS_MANAGER_SECRET_NAME: $SECRETS_MANAGER_SECRET_NAME

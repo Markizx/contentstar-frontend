@@ -2,20 +2,6 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-// Кастомный детектор для SSR
-const pathDetector = {
-  name: 'path',
-  lookup(req) {
-    if (req) {
-      const path = req.url || '';
-      const locale = path.split('/')[1];
-      const supportedLocales = ['en', 'ru', 'uk', 'es', 'de', 'fr'];
-      return supportedLocales.includes(locale) ? locale : 'en';
-    }
-    return undefined;
-  },
-};
-
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -24,76 +10,74 @@ i18n
       en: {
         translation: {
           title: 'ContentStar',
-          login: 'Sign in with Google',
-          logout: 'Sign out',
-          welcome: 'Hello, {name}!',
-          upload: 'Generate Content',
-          error: 'Error generating content',
-          selectFile: 'Select a file',
+          welcome: 'Welcome, {{name}}!',
+          login: 'Login with Google',
+          logout: 'Logout',
+          selectFile: 'Select a file to upload',
+          upload: 'Upload',
+          error: 'An error occurred. Please try again.',
         },
       },
       ru: {
         translation: {
           title: 'ContentStar',
+          welcome: 'Добро пожаловать, {{name}}!',
           login: 'Войти через Google',
           logout: 'Выйти',
-          welcome: 'Привет, {name}!',
-          upload: 'Сгенерировать контент',
-          error: 'Ошибка при генерации контента',
-          selectFile: 'Выберите файл',
+          selectFile: 'Выберите файл для загрузки',
+          upload: 'Загрузить',
+          error: 'Произошла ошибка. Попробуйте снова.',
         },
       },
       uk: {
         translation: {
           title: 'ContentStar',
+          welcome: 'Ласкаво просимо, {{name}}!',
           login: 'Увійти через Google',
           logout: 'Вийти',
-          welcome: 'Привіт, {name}!',
-          upload: 'Згенерувати контент',
-          error: 'Помилка при генерації контенту',
-          selectFile: 'Виберіть файл',
+          selectFile: 'Виберіть файл для завантаження',
+          upload: 'Завантажити',
+          error: 'Сталася помилка. Спробуйте знову.',
         },
       },
       es: {
         translation: {
           title: 'ContentStar',
+          welcome: '¡Bienvenido, {{name}}!',
           login: 'Iniciar sesión con Google',
           logout: 'Cerrar sesión',
-          welcome: '¡Hola, {name}!',
-          upload: 'Generar contenido',
-          error: 'Error al generar contenido',
-          selectFile: 'Selecciona un archivo',
+          selectFile: 'Selecciona un archivo para cargar',
+          upload: 'Cargar',
+          error: 'Ocurrió un error. Por favor, intenta de nuevo.',
         },
       },
       de: {
         translation: {
           title: 'ContentStar',
+          welcome: 'Willkommen, {{name}}!',
           login: 'Mit Google anmelden',
           logout: 'Abmelden',
-          welcome: 'Hallo, {name}!',
-          upload: 'Inhalt generieren',
-          error: 'Fehler beim Generieren des Inhalts',
-          selectFile: 'Wähle eine Datei aus',
+          selectFile: 'Wähle eine Datei zum Hochladen aus',
+          upload: 'Hochladen',
+          error: 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.',
         },
       },
       fr: {
         translation: {
           title: 'ContentStar',
+          welcome: 'Bienvenue, {{name}}!',
           login: 'Se connecter avec Google',
           logout: 'Se déconnecter',
-          welcome: 'Bonjour, {name}!',
-          upload: 'Générer du contenu',
-          error: 'Erreur lors de la génération du contenu',
-          selectFile: 'Sélectionnez un fichier',
+          selectFile: 'Sélectionne un fichier à télécharger',
+          upload: 'Télécharger',
+          error: 'Une erreur s\'est produite. Veuillez réessayer.',
         },
       },
     },
-    supportedLngs: ['en', 'ru', 'uk', 'es', 'de', 'fr'],
     fallbackLng: 'en',
     detection: {
-      order: ['path', 'navigator'],
-      caches: [],
-      lookupFromPathIndex: 0,
+      order: ['path', 'cookie', 'htmlTag'],
+      caches: ['cookie'],
     },
     interpolation: {
       escapeValue: false,
