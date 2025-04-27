@@ -15,6 +15,8 @@ export default function Home({ initialLocale }) {
   const [file, setFile] = useState(null);
   const [result, setResult] = useState('');
   const [userName, setUserName] = useState('User');
+  const [cameraStream, setCameraStream] = useState(null);
+  const [capturedMedia, setCapturedMedia] = useState(null);
   const router = useRouter();
   const { locale } = router;
   const [currentLocale, setCurrentLocale] = useState(initialLocale);
@@ -34,8 +36,10 @@ export default function Home({ initialLocale }) {
     }
   }, [session, status]);
 
+  // Функция для загрузки файла и генерации текста
   const handleUpload = async () => {
     if (!session) return alert('Please sign in');
+    if (!file) return alert('Please select a file');
     const formData = new FormData();
     formData.append('file', file);
     formData.append('prompt', 'Generate a detailed caption for this image in a professional tone');
@@ -48,7 +52,88 @@ export default function Home({ initialLocale }) {
     }
   };
 
-  console.log('Rendering Home component:', { status, session });
+  // Функция для генерации изображения из текста
+  const generateImageFromText = async (text) => {
+    if (!session) return alert('Please sign in');
+    if (!text) return alert('Please enter text to generate an image');
+    try {
+      const res = await axios.post('http://3.25.58.70:5000/api/generate-image', { prompt: text });
+      setResult(res.data.imageUrl);
+    } catch (err) {
+      console.error(err);
+      setResult(t('error'));
+    }
+  };
+
+  // Функция для доступа к камере
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setCameraStream(stream);
+      const video = document.getElementById('camera');
+      video.srcObject = stream;
+    } catch (err) {
+      console.error('Error accessing camera:', err);
+      alert('Could not access the camera');
+    }
+  };
+
+  // Функция для захвата фото
+  const capturePhoto = () => {
+    const video = document.getElementById('camera');
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/png');
+    setCapturedMedia(dataUrl);
+    cameraStream.getTracks().forEach(track => track.stop());
+    setCameraStream(null);
+  };
+
+  // Функция для захвата видео
+  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+
+  const startRecording = () => {
+    if (!cameraStream) return;
+    const recorder = new MediaRecorder(cameraStream);
+    setMediaRecorder(recorder);
+    const chunks = [];
+    recorder.ondataavailable = (e) => chunks.push(e.data);
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      setCapturedMedia(url);
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    };
+    recorder.start();
+    setRecording(true);
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setRecording(false);
+    }
+  };
+
+  // Функция для создания видео из изображения
+  const createVideoFromImage = async () => {
+    if (!session) return alert('Please sign in');
+    if (!file) return alert('Please select an image');
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await axios.post('http://3.25.58.70:5000/api/image-to-video', formData);
+      setResult(res.data.videoUrl);
+    } catch (err) {
+      console.error(err);
+      setResult(t('error'));
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-blue to-blue-600 text-white font-inter">
@@ -97,7 +182,28 @@ export default function Home({ initialLocale }) {
               >
                 {t('logout')}
               </motion.button>
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg">
+
+              {/* Секция для генерации изображения из текста */}
+              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4">
+                <label className="block mb-2 text-lg">{t('generateImage')}</label>
+                <input
+                  type="text"
+                  placeholder={t('enterTextForImage')}
+                  onChange={(e) => setResult(e.target.value)}
+                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4"
+                />
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => generateImageFromText(result)}
+                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                >
+                  {t('generate')}
+                </motion.button>
+              </div>
+
+              {/* Секция для загрузки файла и генерации текста */}
+              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4">
                 <label className="block mb-2 text-lg">{t('selectFile')}</label>
                 <input
                   type="file"
@@ -112,16 +218,105 @@ export default function Home({ initialLocale }) {
                 >
                   {t('upload')}
                 </motion.button>
-                {result && (
+              </div>
+
+              {/* Секция для создания видео из изображения */}
+              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4">
+                <label className="block mb-2 text-lg">{t('createVideoFromImage')}</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFile(e.target.files[0])}
+                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4"
+                />
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={createVideoFromImage}
+                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                >
+                  {t('createVideo')}
+                </motion.button>
+              </div>
+
+              {/* Секция для работы с камерой */}
+              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4">
+                <label className="block mb-2 text-lg">{t('captureMedia')}</label>
+                {!cameraStream ? (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={startCamera}
+                    className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mb-4"
+                  >
+                    {t('startCamera')}
+                  </motion.button>
+                ) : (
+                  <>
+                    <video id="camera" autoPlay className="w-full mb-4"></video>
+                    <div className="flex space-x-4">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={capturePhoto}
+                        className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                      >
+                        {t('capturePhoto')}
+                      </motion.button>
+                      {!recording ? (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={startRecording}
+                          className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                        >
+                          {t('startRecording')}
+                        </motion.button>
+                      ) : (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={stopRecording}
+                          className="block w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                        >
+                          {t('stopRecording')}
+                        </motion.button>
+                      )}
+                    </div>
+                  </>
+                )}
+                {capturedMedia && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="mt-4 p-4 bg-gray-800 rounded-lg"
                   >
-                    {result}
+                    {capturedMedia.includes('image') ? (
+                      <img src={capturedMedia} alt="Captured" className="w-full" />
+                    ) : (
+                      <video src={capturedMedia} controls className="w-full" />
+                    )}
                   </motion.div>
                 )}
               </div>
+
+              {result && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-4 p-4 bg-gray-800 rounded-lg"
+                >
+                  {result.startsWith('http') ? (
+                    result.includes('video') ? (
+                      <video src={result} controls className="w-full" />
+                    ) : (
+                      <img src={result} alt="Generated" className="w-full" />
+                    )
+                  ) : (
+                    <p>{result}</p>
+                  )}
+                </motion.div>
+              )}
             </div>
           )}
         </div>
