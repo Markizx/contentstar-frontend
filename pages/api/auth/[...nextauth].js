@@ -1,6 +1,6 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import { getSecrets } from '../../utils/getSecrets';
+import { getSecrets } from '/utils/getSecrets';
 
 export default async function auth(req, res) {
   try {
