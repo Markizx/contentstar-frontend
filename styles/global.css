@@ -1,9 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 body {
   font-family: 'Inter', sans-serif;
   background: linear-gradient(to bottom right, #1E3A8A, #2563EB);
   color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.flex {
+  display: flex;
 }
 
 .sidebar {
@@ -45,6 +58,8 @@ body {
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
   margin: 0 auto;
   display: block;
+  border: none;
+  cursor: pointer;
 }
 
 .button-logout {
@@ -56,6 +71,8 @@ body {
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
   margin-bottom: 1rem;
+  border: none;
+  cursor: pointer;
 }
 
 .button-logout:hover {
@@ -70,6 +87,8 @@ body {
   border-radius: 0.5rem;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
+  border: none;
+  cursor: pointer;
 }
 
 .card {

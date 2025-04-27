@@ -7,7 +7,11 @@ import { motion } from 'framer-motion';
 
 export default function Home({ initialLocale }) {
   const { t, i18n } = useTranslation();
+  console.log('useTranslation:', t, i18n);
+
   const { data: session, status } = useSession();
+  console.log('useSession:', { session, status });
+
   const [file, setFile] = useState(null);
   const [result, setResult] = useState('');
   const [userName, setUserName] = useState('User');
@@ -17,6 +21,7 @@ export default function Home({ initialLocale }) {
 
   useEffect(() => {
     const effectiveLocale = locale || initialLocale;
+    console.log('Locale:', effectiveLocale);
     setCurrentLocale(effectiveLocale);
     if (effectiveLocale && i18n.language !== effectiveLocale) {
       i18n.changeLanguage(effectiveLocale);
@@ -42,6 +47,8 @@ export default function Home({ initialLocale }) {
       setResult(t('error'));
     }
   };
+
+  console.log('Rendering Home component:', { status, session });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-blue to-blue-600 text-white font-inter">

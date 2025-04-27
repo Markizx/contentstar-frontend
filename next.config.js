@@ -16,7 +16,6 @@ const nextConfig = {
     i18n: {
       locales: ['en', 'ru', 'uk', 'es', 'de', 'fr'],
       defaultLocale: 'en',
-      // localeDetection: true, // Удаляем или устанавливаем false
     },
     images: {
       domains: ['contentstar-files.s3.ap-southeast-2.amazonaws.com'],
