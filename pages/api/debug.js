@@ -1,9 +1,6 @@
-import getConfig from 'next/config';
+import { getSecrets } from '../../utils/getSecrets';
 
-const { publicRuntimeConfig } = getConfig();
-
-export default function handler(req, res) {
-  // Добавляем заголовки CORS
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -12,20 +9,18 @@ export default function handler(req, res) {
   console.log('Request method:', req.method);
   console.log('Request headers:', req.headers);
 
-  // Проверяем наличие переменных окружения через publicRuntimeConfig
-  const envVars = {
-    GOOGLE_CLIENT_ID: publicRuntimeConfig.GOOGLE_CLIENT_ID || 'Not set',
-    GOOGLE_CLIENT_SECRET: publicRuntimeConfig.GOOGLE_CLIENT_SECRET || 'Not set',
-    NEXTAUTH_SECRET: publicRuntimeConfig.NEXTAUTH_SECRET || 'Not set',
-    NEXTAUTH_URL: publicRuntimeConfig.NEXTAUTH_URL || 'Not set',
-  };
-
-  console.log('Environment variables:', envVars);
-
-  // Проверяем, доходит ли выполнение до этого момента
-  console.log('Preparing response...');
-
   try {
+    const secrets = await getSecrets();
+    const envVars = {
+      GOOGLE_CLIENT_ID: secrets.GOOGLE_CLIENT_ID || 'Not set',
+      GOOGLE_CLIENT_SECRET: secrets.GOOGLE_CLIENT_SECRET || 'Not set',
+      NEXTAUTH_SECRET: secrets.NEXTAUTH_SECRET || 'Not set',
+      NEXTAUTH_URL: secrets.NEXTAUTH_URL || 'Not set',
+    };
+
+    console.log('Environment variables:', envVars);
+
+    console.log('Preparing response...');
     const response = {
       message: 'Debug route working',
       environment: envVars,
@@ -36,6 +31,4 @@ export default function handler(req, res) {
     console.error('Error in /api/debug:', error);
     res.status(500).json({ error: 'Internal Server Error', message: error.message });
   }
-
-  console.log('After res.json - this should not be logged');
 }
