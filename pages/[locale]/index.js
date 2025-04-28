@@ -34,14 +34,19 @@ export default function Home({ initialLocale }) {
     if (!session) return alert('Please sign in');
     if (!file) return alert('Please select a file');
     const formData = new FormData();
-    formData.append('file', file);
+    console.log('Uploading file:', file); // Отладка
+    formData.append('file', file); // Поле называется 'file'
     formData.append('prompt', 'Generate a detailed caption for this image in a professional tone');
     try {
       const res = await axios.post('http://3.25.58.70:5000/api/generate', formData);
       setResult(res.data.generatedContent);
     } catch (err) {
       console.error('Error in handleUpload:', err);
-      setResult(t('error'));
+      if (err.response) {
+        setResult(`Upload failed: ${err.response.data.error || 'Server error'}`);
+      } else {
+        setResult(t('error'));
+      }
     }
   };
 
@@ -53,7 +58,11 @@ export default function Home({ initialLocale }) {
       setResult(res.data.imageUrl);
     } catch (err) {
       console.error('Error in generateImageFromText:', err);
-      setResult(t('error'));
+      if (err.response) {
+        setResult(`Image generation failed: ${err.response.data.error || 'Server error'}`);
+      } else {
+        setResult(t('error'));
+      }
     }
   };
 
@@ -62,6 +71,9 @@ export default function Home({ initialLocale }) {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setCameraStream(stream);
       const video = document.getElementById('camera');
+      if (!video) {
+        throw new Error('Video element not found');
+      }
       video.srcObject = stream;
     } catch (err) {
       console.error('Error accessing camera:', err);
@@ -71,6 +83,10 @@ export default function Home({ initialLocale }) {
 
   const capturePhoto = () => {
     const video = document.getElementById('camera');
+    if (!video) {
+      console.error('Video element not found');
+      return;
+    }
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -114,12 +130,17 @@ export default function Home({ initialLocale }) {
     if (!file) return alert('Please select an image');
     try {
       const formData = new FormData();
-      formData.append('image', file);
+      console.log('Uploading image for video:', file); // Отладка
+      formData.append('image', file); // Поле называется 'image'
       const res = await axios.post('http://3.25.58.70:5000/api/image-to-video', formData);
       setResult(res.data.videoUrl);
     } catch (err) {
       console.error('Error in createVideoFromImage:', err);
-      setResult(t('error'));
+      if (err.response) {
+        setResult(`Video creation failed: ${err.response.data.error || 'Server error'}`);
+      } else {
+        setResult(t('error'));
+      }
     }
   };
 
@@ -344,7 +365,7 @@ export default function Home({ initialLocale }) {
                   transition={{ duration: 0.5, delay: 0.4 }}
                   className="result"
                 >
-                  {result.startsWith('http') ? (
+                  {result.startsWith('http') || result.startsWith('data:image') ? (
                     result.includes('video') ? (
                       <video src={result} controls className="w-full rounded-lg shadow-md" />
                     ) : (
