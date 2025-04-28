@@ -1,23 +1,17 @@
 import { NextResponse } from 'next/server';
 
 export function middleware(request) {
-  console.log('Middleware called for path:', request.nextUrl.pathname);
+  const { pathname, search } = request.nextUrl;
 
-  const { pathname } = request.nextUrl;
-  const locales = ['en', 'ru', 'uk', 'es', 'de', 'fr'];
-
-  const locale = pathname.split('/')[1];
-  console.log('Detected locale:', locale);
-
-  if (!locales.includes(locale)) {
-    console.log('Locale not found, redirecting to /en');
-    return NextResponse.redirect(new URL('/en', request.url));
+  // Если путь — корневой ("/"), перенаправляем на /en
+  if (pathname === '/') {
+    const redirectUrl = new URL('/en' + (search || ''), request.url);
+    return NextResponse.redirect(redirectUrl);
   }
 
-  console.log('Middleware proceeding with locale:', locale);
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: '/((?!api|_next|favicon.ico).*)',
+  matcher: ['/((?!api|_next|static|favicon.ico).*)'],
 };
