@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { FaCamera, FaVideo, FaImage, FaUpload, FaSignOutAlt, FaSignInAlt } from 'react-icons/fa';
 
-export default function Home() {
+export default function Home({ initialLocale }) {
   const { t, i18n } = useTranslation();
   const { data: session, status } = useSession();
   const [file, setFile] = useState(null);
@@ -15,12 +15,14 @@ export default function Home() {
   const [cameraStream, setCameraStream] = useState(null);
   const [capturedMedia, setCapturedMedia] = useState(null);
   const router = useRouter();
-  const [currentLocale, setCurrentLocale] = useState('ru');
+  const { locale } = router;
+  const [currentLocale, setCurrentLocale] = useState(initialLocale);
 
   useEffect(() => {
-    i18n.changeLanguage('ru');
-    setCurrentLocale('ru');
-  }, [i18n]);
+    const effectiveLocale = locale || initialLocale;
+    setCurrentLocale(effectiveLocale);
+    i18n.changeLanguage(effectiveLocale);
+  }, [locale, initialLocale, i18n]);
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.name) {
@@ -367,4 +369,13 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+export async function getServerSideProps({ params }) {
+  const initialLocale = params?.locale || 'en';
+  return {
+    props: {
+      initialLocale,
+    },
+  };
 }
