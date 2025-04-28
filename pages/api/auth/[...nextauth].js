@@ -6,9 +6,15 @@ if (!process.env.NEXTAUTH_URL) {
   throw new Error('NEXTAUTH_URL is not set');
 }
 
+// Определяем baseUrl
+const baseUrl = process.env.NEXTAUTH_URL;
+
 export default async function auth(req, res) {
-  // Отладка: выведем NEXTAUTH_URL
+  // Отладка: выведем NEXTAUTH_URL, baseUrl и заголовки запроса
   console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+  console.log('Base URL:', baseUrl);
+  console.log('Request Headers:', req.headers);
+  console.log('Host Header:', req.headers.host);
 
   return NextAuth(req, res, {
     providers: [
@@ -17,8 +23,8 @@ export default async function auth(req, res) {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         authorization: {
           params: {
-            // Явно задаём redirect_uri на основе NEXTAUTH_URL
-            redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
+            // Явно задаём redirect_uri
+            redirect_uri: `${baseUrl}/api/auth/callback/google`,
           },
         },
       }),
@@ -31,6 +37,13 @@ export default async function auth(req, res) {
         // Используем NEXTAUTH_URL вместо baseUrl
         return process.env.NEXTAUTH_URL;
       },
+    },
+    pages: {
+      signIn: '/auth/signin',
+      signOut: '/auth/signout',
+      error: '/auth/error',
+      verifyRequest: '/auth/verify-request',
+      newUser: null,
     },
   });
 }
