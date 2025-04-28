@@ -1,7 +1,12 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
+// Настройка клиента Secrets Manager с новыми именами переменных
 const secretsManager = new SecretsManagerClient({
-  region: 'ap-southeast-2', // Укажи регион, где хранятся твои секреты
+  region: process.env.REGION || 'ap-southeast-2',
+  credentials: {
+    accessKeyId: process.env.ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY,
+  },
 });
 
 export async function getSecrets() {
