@@ -1,61 +1,47 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import { getSecrets } from '../../../utils/getSecrets';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+
+const client = new SecretsManagerClient({
+  region: process.env.AWS_REGION || 'ap-southeast-2',
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+const getSecrets = async () => {
+  try {
+    const command = new GetSecretValueCommand({
+      SecretId: 'contentstar-secrets',
+    });
+    const response = await client.send(command);
+    return JSON.parse(response.SecretString);
+  } catch (err) {
+    console.error('Error retrieving secrets:', err);
+    return {
+      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+      NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    };
+  }
+};
 
 export default async function auth(req, res) {
-  let secrets = {
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-  };
-
-  try {
-    secrets = await getSecrets();
-  } catch (error) {
-    console.error('Failed to load secrets from Secrets Manager, using environment variables:', error);
-  }
-
-  return await NextAuth(req, res, {
+  const secrets = await getSecrets();
+  return NextAuth(req, res, {
     providers: [
       GoogleProvider({
-        clientId: secrets.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID,
-        clientSecret: secrets.GOOGLE_CLIENT_SECRET || process.env.GOOGLE_CLIENT_SECRET,
+        clientId: secrets.GOOGLE_CLIENT_ID,
+        clientSecret: secrets.GOOGLE_CLIENT_SECRET,
       }),
     ],
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: secrets.NEXTAUTH_SECRET,
     callbacks: {
-      async session({ session, token, user }) {
-        session.user = user;
-        return session;
-      },
-    },
-    // Настройка cookie
-    cookies: {
-      state: {
-        name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.state`,
-        options: {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          path: '/',
-          sameSite: 'lax',
-        },
-      },
-      callback: {
-        name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.callback-url`,
-        options: {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          path: '/',
-          sameSite: 'lax',
-        },
-      },
-      session: {
-        name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
-        options: {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          path: '/',
-          sameSite: 'lax',
-        },
+      async redirect({ url, baseUrl }) {
+        // Убедимся, что redirectUrl использует правильный домен
+        return baseUrl;
       },
     },
   });
