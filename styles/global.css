@@ -3,114 +3,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body {
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(to bottom right, #1E3A8A, #2563EB);
-  color: white;
-  margin: 0;
-  padding: 0;
-}
 
-.min-h-screen {
-  min-height: 100vh;
-}
+/* Добавим пользовательские стили через Tailwind */
+@layer components {
+  .button-login {
+    @apply bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mx-auto block border-none cursor-pointer;
+  }
 
-.flex {
-  display: flex;
-}
+  .button-logout {
+    @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg w-full mb-4 border-none cursor-pointer;
+  }
 
-.sidebar {
-  width: 16rem;
-  background: rgba(17, 24, 39, 0.3);
-  backdrop-filter: blur(10px);
-  padding: 1.5rem;
-  position: fixed;
-  height: 100%;
-}
+  .button-upload {
+    @apply bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg w-full border-none cursor-pointer;
+  }
 
-.sidebar h1 {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.875rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-}
+  .card {
+    @apply bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg;
+  }
 
-.sidebar select {
-  width: 100%;
-  background: #1F2937;
-  color: white;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-}
+  .input-file {
+    @apply w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4;
+  }
 
-.content {
-  margin-left: 16rem;
-  padding: 1.5rem;
-  width: 100%;
-}
-
-.button-login {
-  background: linear-gradient(to right, #8B5CF6, #EC4899);
-  color: white;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  margin: 0 auto;
-  display: block;
-  border: none;
-  cursor: pointer;
-}
-
-.button-logout {
-  background: #EF4444;
-  color: white;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  margin-bottom: 1rem;
-  border: none;
-  cursor: pointer;
-}
-
-.button-logout:hover {
-  background: #DC2626;
-}
-
-.button-upload {
-  background: linear-gradient(to right, #3B82F6, #8B5CF6);
-  color: white;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  border: none;
-  cursor: pointer;
-}
-
-.card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-}
-
-.input-file {
-  width: 100%;
-  color: #D1D5DB;
-  background: #1F2937;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.result {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: #1F2937;
-  border-radius: 0.5rem;
+  .result {
+    @apply mt-4 p-4 bg-gray-800 rounded-lg shadow-lg;
+  }
 }

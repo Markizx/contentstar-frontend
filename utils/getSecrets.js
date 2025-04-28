@@ -1,41 +1,21 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
 const secretsManager = new SecretsManagerClient({
-  region: 'ap-southeast-2',
+  region: 'ap-southeast-2', // Укажи регион, где хранятся твои секреты
 });
 
-let cachedSecrets = null;
-
 export async function getSecrets() {
-  if (cachedSecrets) {
-    console.log('Returning cached secrets:', cachedSecrets);
-    return cachedSecrets;
-  }
-
-  console.log('Fetching secrets from Secrets Manager...');
-  console.log('SECRETS_MANAGER_SECRET_NAME:', process.env.SECRETS_MANAGER_SECRET_NAME);
-
-  if (!process.env.SECRETS_MANAGER_SECRET_NAME) {
-    throw new Error('SECRETS_MANAGER_SECRET_NAME is not set');
-  }
-
   try {
     const command = new GetSecretValueCommand({
-      SecretId: process.env.SECRETS_MANAGER_SECRET_NAME,
+      SecretId: process.env.SECRETS_MANAGER_SECRET_NAME || 'contentstar-secrets',
     });
     const data = await secretsManager.send(command);
-
-    console.log('Secrets Manager response:', data);
-
     if (data.SecretString) {
-      cachedSecrets = JSON.parse(data.SecretString);
-      console.log('Parsed secrets:', cachedSecrets);
-      return cachedSecrets;
-    } else {
-      throw new Error('Secret not found');
+      return JSON.parse(data.SecretString);
     }
+    throw new Error('SecretString is empty');
   } catch (error) {
-    console.error('Error fetching secrets:', error);
+    console.error('Error retrieving secrets:', error);
     throw error;
   }
 }
