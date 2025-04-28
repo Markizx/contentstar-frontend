@@ -1,29 +1,31 @@
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+     apiVersion: '2022-11-15',
+   });
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+   export default async function handler(req, res) {
+     if (req.method !== 'POST') {
+       return res.status(405).json({ error: 'Method not allowed' });
+     }
 
-  try {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: 'price_1N...', // Укажи ID цены из Stripe
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: 'https://contentstar.app/success',
-      cancel_url: 'https://contentstar.app/cancel',
-    });
+     try {
+       const { email, paymentMethodId } = req.body;
+       const customer = await stripe.customers.create({
+         email,
+         payment_method: paymentMethodId,
+         invoice_settings: { default_payment_method: paymentMethodId },
+       });
 
-    res.status(200).json({ url: session.url });
-  } catch (error) {
-    console.error('Error creating subscription:', error);
-    res.status(500).json({ error: 'Failed to create subscription' });
-  }
-}
+       const subscription = await stripe.subscriptions.create({
+         customer: customer.id,
+         items: [{ price: 'price_xxxxxxxxxxxxxxxxxxxxxxxx' }], // Замени на свой price ID
+         expand: ['latest_invoice.payment_intent'],
+       });
+
+       return res.status(200).json({ subscription });
+     } catch (error) {
+       console.error('Error creating subscription:', error);
+       return res.status(500).json({ error: 'Failed to create subscription' });
+     }
+   }
