@@ -3,7 +3,10 @@ module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
-    "./src/**/*.{js,ts,jsx,tsx}", // Добавь, если у тебя есть директория src
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  safelist: [
+    'text-white', // Гарантируем, что утилита text-white включена
   ],
   theme: {
     extend: {
@@ -14,6 +17,9 @@ module.exports = {
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
         poppins: ['Poppins', 'sans-serif'],
+      },
+      backdropBlur: {
+        lg: '10px',
       },
     },
   },

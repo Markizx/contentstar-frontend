@@ -4,7 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Добавим пользовательские стили через Tailwind */
+/* Базовые стили для body */
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    @apply text-white m-0 p-0;
+  }
+}
+
+/* Пользовательские компоненты */
 @layer components {
   .button-login {
     @apply bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mx-auto block border-none cursor-pointer;

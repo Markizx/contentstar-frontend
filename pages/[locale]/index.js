@@ -166,7 +166,7 @@ export default function Home({ initialLocale }) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => signIn('google')}
-              className="block mx-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center"
+              className="button-login"
             >
               <FaSignInAlt className="mr-2" /> {t('login')}
             </motion.button>
@@ -186,7 +186,7 @@ export default function Home({ initialLocale }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => signOut()}
-                className="block w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mb-4 flex items-center justify-center"
+                className="button-logout"
               >
                 <FaSignOutAlt className="mr-2" /> {t('logout')}
               </motion.button>
@@ -196,7 +196,7 @@ export default function Home({ initialLocale }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4"
+                className="card mb-4"
               >
                 <label className="block mb-2 text-lg flex items-center">
                   <FaImage className="mr-2" /> {t('generateImage')}
@@ -205,13 +205,13 @@ export default function Home({ initialLocale }) {
                   type="text"
                   placeholder={t('enterTextForImage')}
                   onChange={(e) => setResult(e.target.value)}
-                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4 shadow-md"
+                  className="input-file"
                 />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => generateImageFromText(result)}
-                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
+                  className="button-upload"
                 >
                   <FaImage className="mr-2" /> {t('generate')}
                 </motion.button>
@@ -222,7 +222,7 @@ export default function Home({ initialLocale }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4"
+                className="card mb-4"
               >
                 <label className="block mb-2 text-lg flex items-center">
                   <FaUpload className="mr-2" /> {t('selectFile')}
@@ -230,13 +230,13 @@ export default function Home({ initialLocale }) {
                 <input
                   type="file"
                   onChange={(e) => setFile(e.target.files[0])}
-                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4 shadow-md"
+                  className="input-file"
                 />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleUpload}
-                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
+                  className="button-upload"
                 >
                   <FaUpload className="mr-2" /> {t('upload')}
                 </motion.button>
@@ -247,7 +247,7 @@ export default function Home({ initialLocale }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4"
+                className="card mb-4"
               >
                 <label className="block mb-2 text-lg flex items-center">
                   <FaVideo className="mr-2" /> {t('createVideoFromImage')}
@@ -256,13 +256,13 @@ export default function Home({ initialLocale }) {
                   type="file"
                   accept="image/*"
                   onChange={(e) => setFile(e.target.files[0])}
-                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4 shadow-md"
+                  className="input-file"
                 />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={createVideoFromImage}
-                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
+                  className="button-upload"
                 >
                   <FaVideo className="mr-2" /> {t('createVideo')}
                 </motion.button>
@@ -273,7 +273,7 @@ export default function Home({ initialLocale }) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4"
+                className="card mb-4"
               >
                 <label className="block mb-2 text-lg flex items-center">
                   <FaCamera className="mr-2" /> {t('captureMedia')}
@@ -283,7 +283,7 @@ export default function Home({ initialLocale }) {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={startCamera}
-                    className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mb-4 flex items-center justify-center"
+                    className="button-upload mb-4"
                   >
                     <FaCamera className="mr-2" /> {t('startCamera')}
                   </motion.button>
@@ -295,7 +295,7 @@ export default function Home({ initialLocale }) {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={capturePhoto}
-                        className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
+                        className="button-upload"
                       >
                         <FaCamera className="mr-2" /> {t('capturePhoto')}
                       </motion.button>
@@ -304,7 +304,7 @@ export default function Home({ initialLocale }) {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={startRecording}
-                          className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
+                          className="button-upload"
                         >
                           <FaVideo className="mr-2" /> {t('startRecording')}
                         </motion.button>
@@ -313,7 +313,7 @@ export default function Home({ initialLocale }) {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={stopRecording}
-                          className="block w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
+                          className="button-logout"
                         >
                           <FaVideo className="mr-2" /> {t('stopRecording')}
                         </motion.button>
@@ -326,7 +326,7 @@ export default function Home({ initialLocale }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    className="mt-4 p-4 bg-gray-800 rounded-lg shadow-lg"
+                    className="result"
                   >
                     {capturedMedia.includes('image') ? (
                       <img src={capturedMedia} alt="Captured" className="w-full rounded-lg shadow-md" />
@@ -342,7 +342,7 @@ export default function Home({ initialLocale }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
-                  className="mt-4 p-4 bg-gray-800 rounded-lg shadow-lg"
+                  className="result"
                 >
                   {result.startsWith('http') ? (
                     result.includes('video') ? (
@@ -357,7 +357,7 @@ export default function Home({ initialLocale }) {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleDownload}
-                    className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mt-4 flex items-center justify-center"
+                    className="button-upload mt-4"
                   >
                     <FaUpload className="mr-2" /> Download
                   </motion.button>
