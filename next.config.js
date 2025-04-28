@@ -13,11 +13,6 @@ const nextConfig = {
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   },
-  i18n: {
-    locales: ['en', 'ru', 'uk', 'es', 'de', 'fr'],
-    defaultLocale: 'en',
-    localeDetection: false, // Отключаем автоматическое определение локали
-  },
   images: {
     domains: ['contentstar-files.s3.ap-southeast-2.amazonaws.com'],
   },
