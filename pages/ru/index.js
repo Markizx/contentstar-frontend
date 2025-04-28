@@ -4,33 +4,23 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { FaCamera, FaVideo, FaImage, FaUpload, FaSignOutAlt, FaSignInAlt } from 'react-icons/fa';
 
-export default function Home({ initialLocale }) {
-  console.log('Rendering pages/[locale]/index.js with initialLocale:', initialLocale);
-
+export default function Home() {
   const { t, i18n } = useTranslation();
-  console.log('useTranslation:', t, i18n);
-
   const { data: session, status } = useSession();
-  console.log('useSession:', { session, status });
-
   const [file, setFile] = useState(null);
   const [result, setResult] = useState('');
   const [userName, setUserName] = useState('User');
   const [cameraStream, setCameraStream] = useState(null);
   const [capturedMedia, setCapturedMedia] = useState(null);
   const router = useRouter();
-  const { locale } = router;
-  const [currentLocale, setCurrentLocale] = useState(initialLocale);
+  const [currentLocale, setCurrentLocale] = useState('ru');
 
   useEffect(() => {
-    const effectiveLocale = locale || initialLocale;
-    console.log('Locale:', effectiveLocale);
-    setCurrentLocale(effectiveLocale);
-    if (effectiveLocale && i18n.language !== effectiveLocale) {
-      i18n.changeLanguage(effectiveLocale);
-    }
-  }, [locale, initialLocale, i18n]);
+    i18n.changeLanguage('ru');
+    setCurrentLocale('ru');
+  }, [i18n]);
 
   useEffect(() => {
     if (status === 'authenticated' && session?.user?.name) {
@@ -38,7 +28,6 @@ export default function Home({ initialLocale }) {
     }
   }, [session, status]);
 
-  // Функция для загрузки файла и генерации текста
   const handleUpload = async () => {
     if (!session) return alert('Please sign in');
     if (!file) return alert('Please select a file');
@@ -54,7 +43,6 @@ export default function Home({ initialLocale }) {
     }
   };
 
-  // Функция для генерации изображения из текста
   const generateImageFromText = async (text) => {
     if (!session) return alert('Please sign in');
     if (!text) return alert('Please enter text to generate an image');
@@ -67,7 +55,6 @@ export default function Home({ initialLocale }) {
     }
   };
 
-  // Функция для доступа к камере
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -80,7 +67,6 @@ export default function Home({ initialLocale }) {
     }
   };
 
-  // Функция для захвата фото
   const capturePhoto = () => {
     const video = document.getElementById('camera');
     const canvas = document.createElement('canvas');
@@ -94,7 +80,6 @@ export default function Home({ initialLocale }) {
     setCameraStream(null);
   };
 
-  // Функция для захвата видео
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
 
@@ -122,7 +107,6 @@ export default function Home({ initialLocale }) {
     }
   };
 
-  // Функция для создания видео из изображения
   const createVideoFromImage = async () => {
     if (!session) return alert('Please sign in');
     if (!file) return alert('Please select an image');
@@ -137,18 +121,31 @@ export default function Home({ initialLocale }) {
     }
   };
 
-  console.log('Rendering Home component:', { status, session });
+  const handleDownload = () => {
+    if (!result) return;
+    const link = document.createElement('a');
+    link.href = result;
+    link.download = result.includes('video') ? 'generated-video.webm' : 'generated-image.png';
+    link.click();
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-blue to-blue-600 text-white font-inter">
       <div className="flex">
-        <div className="w-64 bg-gray-900/30 backdrop-blur-lg p-6 fixed h-full">
-          <h1 className="text-3xl font-poppins font-bold mb-8">{t('title')}</h1>
+        <motion.div
+          initial={{ x: -100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="w-64 bg-gray-900/30 backdrop-blur-lg p-6 fixed h-full shadow-xl"
+        >
+          <h1 className="text-3xl font-poppins font-bold mb-8 flex items-center">
+            <FaImage className="mr-2" /> {t('title')}
+          </h1>
           <p className="mb-4">Locale: {currentLocale}</p>
           <select
             value={currentLocale}
             onChange={(e) => router.push(`/${e.target.value}`)}
-            className="w-full bg-gray-800 text-white p-2 rounded-lg"
+            className="w-full bg-gray-800 text-white p-2 rounded-lg shadow-md"
           >
             <option value="en">English</option>
             <option value="ru">Русский</option>
@@ -157,7 +154,7 @@ export default function Home({ initialLocale }) {
             <option value="de">Deutsch</option>
             <option value="fr">Français</option>
           </select>
-        </div>
+        </motion.div>
 
         <div className="ml-64 p-6 w-full">
           {status === 'loading' ? (
@@ -167,123 +164,156 @@ export default function Home({ initialLocale }) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => signIn('google')}
-              className="block mx-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+              className="block mx-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center"
             >
-              {t('login')}
+              <FaSignInAlt className="mr-2" /> {t('login')}
             </motion.button>
           ) : (
             <div className="max-w-2xl mx-auto">
-              <p className="mb-4 text-xl">
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="mb-4 text-xl"
+              >
                 {status === 'authenticated' && userName
                   ? t('welcome', { name: userName })
                   : 'Loading user...'}
-              </p>
+              </motion.p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => signOut()}
-                className="block w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mb-4"
+                className="block w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mb-4 flex items-center justify-center"
               >
-                {t('logout')}
+                <FaSignOutAlt className="mr-2" /> {t('logout')}
               </motion.button>
 
               {/* Секция для генерации изображения из текста */}
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4">
-                <label className="block mb-2 text-lg">{t('generateImage')}</label>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4"
+              >
+                <label className="block mb-2 text-lg flex items-center">
+                  <FaImage className="mr-2" /> {t('generateImage')}
+                </label>
                 <input
                   type="text"
                   placeholder={t('enterTextForImage')}
                   onChange={(e) => setResult(e.target.value)}
-                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4"
+                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4 shadow-md"
                 />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => generateImageFromText(result)}
-                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
                 >
-                  {t('generate')}
+                  <FaImage className="mr-2" /> {t('generate')}
                 </motion.button>
-              </div>
+              </motion.div>
 
               {/* Секция для загрузки файла и генерации текста */}
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4">
-                <label className="block mb-2 text-lg">{t('selectFile')}</label>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4"
+              >
+                <label className="block mb-2 text-lg flex items-center">
+                  <FaUpload className="mr-2" /> {t('selectFile')}
+                </label>
                 <input
                   type="file"
                   onChange={(e) => setFile(e.target.files[0])}
-                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4"
+                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4 shadow-md"
                 />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleUpload}
-                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
                 >
-                  {t('upload')}
+                  <FaUpload className="mr-2" /> {t('upload')}
                 </motion.button>
-              </div>
+              </motion.div>
 
               {/* Секция для создания видео из изображения */}
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4">
-                <label className="block mb-2 text-lg">{t('createVideoFromImage')}</label>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4"
+              >
+                <label className="block mb-2 text-lg flex items-center">
+                  <FaVideo className="mr-2" /> {t('createVideoFromImage')}
+                </label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => setFile(e.target.files[0])}
-                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4"
+                  className="block w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4 shadow-md"
                 />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={createVideoFromImage}
-                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                  className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
                 >
-                  {t('createVideo')}
+                  <FaVideo className="mr-2" /> {t('createVideo')}
                 </motion.button>
-              </div>
+              </motion.div>
 
               {/* Секция для работы с камерой */}
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4">
-                <label className="block mb-2 text-lg">{t('captureMedia')}</label>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg mb-4"
+              >
+                <label className="block mb-2 text-lg flex items-center">
+                  <FaCamera className="mr-2" /> {t('captureMedia')}
+                </label>
                 {!cameraStream ? (
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={startCamera}
-                    className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mb-4"
+                    className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mb-4 flex items-center justify-center"
                   >
-                    {t('startCamera')}
+                    <FaCamera className="mr-2" /> {t('startCamera')}
                   </motion.button>
                 ) : (
                   <>
-                    <video id="camera" autoPlay className="w-full mb-4"></video>
+                    <video id="camera" autoPlay className="w-full mb-4 rounded-lg shadow-md"></video>
                     <div className="flex space-x-4">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={capturePhoto}
-                        className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                        className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
                       >
-                        {t('capturePhoto')}
+                        <FaCamera className="mr-2" /> {t('capturePhoto')}
                       </motion.button>
                       {!recording ? (
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={startRecording}
-                          className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                          className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
                         >
-                          {t('startRecording')}
+                          <FaVideo className="mr-2" /> {t('startRecording')}
                         </motion.button>
                       ) : (
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={stopRecording}
-                          className="block w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg"
+                          className="block w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg flex items-center justify-center"
                         >
-                          {t('stopRecording')}
+                          <FaVideo className="mr-2" /> {t('stopRecording')}
                         </motion.button>
                       )}
                     </div>
@@ -293,32 +323,42 @@ export default function Home({ initialLocale }) {
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="mt-4 p-4 bg-gray-800 rounded-lg"
+                    transition={{ duration: 0.5 }}
+                    className="mt-4 p-4 bg-gray-800 rounded-lg shadow-lg"
                   >
                     {capturedMedia.includes('image') ? (
-                      <img src={capturedMedia} alt="Captured" className="w-full" />
+                      <img src={capturedMedia} alt="Captured" className="w-full rounded-lg shadow-md" />
                     ) : (
-                      <video src={capturedMedia} controls className="w-full" />
+                      <video src={capturedMedia} controls className="w-full rounded-lg shadow-md" />
                     )}
                   </motion.div>
                 )}
-              </div>
+              </motion.div>
 
               {result && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4 p-4 bg-gray-800 rounded-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="mt-4 p-4 bg-gray-800 rounded-lg shadow-lg"
                 >
                   {result.startsWith('http') ? (
                     result.includes('video') ? (
-                      <video src={result} controls className="w-full" />
+                      <video src={result} controls className="w-full rounded-lg shadow-md" />
                     ) : (
-                      <img src={result} alt="Generated" className="w-full" />
+                      <img src={result} alt="Generated" className="w-full rounded-lg shadow-md" />
                     )
                   ) : (
                     <p>{result}</p>
                   )}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleDownload}
+                    className="block w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mt-4 flex items-center justify-center"
+                  >
+                    <FaUpload className="mr-2" /> Download
+                  </motion.button>
                 </motion.div>
               )}
             </div>
@@ -327,29 +367,4 @@ export default function Home({ initialLocale }) {
       </div>
     </div>
   );
-}
-
-export async function getStaticPaths() {
-  console.log('getStaticPaths called');
-  return {
-    paths: [
-      { params: { locale: 'en' } },
-      { params: { locale: 'ru' } },
-      { params: { locale: 'uk' } },
-      { params: { locale: 'es' } },
-      { params: { locale: 'de' } },
-      { params: { locale: 'fr' } },
-    ],
-    fallback: false,
-  };
-}
-
-export async function getStaticProps({ params }) {
-  console.log('getStaticProps called with params:', params);
-  const initialLocale = params?.locale || 'en';
-  return {
-    props: {
-      initialLocale,
-    },
-  };
 }
