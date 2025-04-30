@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { MongoClient } from 'mongodb';
-import { getSecrets } from '../../utils/getsecrets.js';
+import { getSecrets } from '../../utils/getsecrets';
 
 export default NextAuth({
   providers: [
