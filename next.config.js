@@ -16,6 +16,10 @@ const nextConfig = {
   images: {
     domains: ['contentstar-files.s3.ap-southeast-2.amazonaws.com'],
   },
-};
 
 module.exports = nextConfig;
+i18n: {
+  locales: ['en', 'ru', 'uk', 'es', 'de', 'fr'],
+  defaultLocale: 'en',
+},
+};

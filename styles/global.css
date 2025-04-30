@@ -1,40 +1,76 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
-
+/* styles/global.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Базовые стили для body */
-@layer base {
-  body {
+body {
+    margin: 0;
     font-family: 'Inter', sans-serif;
-    @apply text-white m-0 p-0;
-  }
 }
 
-/* Пользовательские компоненты */
-@layer components {
-  .button-login {
-    @apply bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg mx-auto block border-none cursor-pointer;
-  }
+.card {
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
 
-  .button-logout {
-    @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg w-full mb-4 border-none cursor-pointer;
-  }
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
 
-  .button-upload {
-    @apply bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg w-full border-none cursor-pointer;
-  }
+.button-upload, .button-login {
+    transition: all 0.3s ease;
+}
 
-  .card {
-    @apply bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg;
-  }
+.button-logout {
+    transition: all 0.3s ease;
+}
 
-  .input-file {
-    @apply w-full text-gray-300 bg-gray-800 rounded-lg p-2 mb-4;
-  }
+.input-file {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
 
-  .result {
-    @apply mt-4 p-4 bg-gray-800 rounded-lg shadow-lg;
-  }
+.input-file:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.result {
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .md\:ml-64 {
+        margin-left: 0;
+    }
+    .md\:fixed {
+        position: static;
+    }
+    .md\:h-full {
+        height: auto;
+    }
+    .md\:w-64 {
+        width: 100%;
+    }
+    .md\:w-auto {
+        width: 100%;
+    }
+    .md\:mx-0 {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .md\:flex-row {
+        flex-direction: column;
+    }
+    .md\:space-y-0 {
+        space-y: 1rem;
+    }
+    .md\:space-x-4 {
+        space-x: 0;
+    }
+    .md\:text-left {
+        text-align: center;
+    }
 }

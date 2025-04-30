@@ -3,8 +3,8 @@ frontend:
   phases:
     preBuild:
       commands:
+        - npm cache clean --force
         - npm ci
-        - echo "SECRETS_MANAGER_SECRET_NAME=$SECRETS_MANAGER_SECRET_NAME"
     build:
       commands:
         - npm run build

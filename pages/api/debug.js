@@ -3,14 +3,15 @@ import { getSecrets } from '/utils/getSecrets';
 export default async function handler(req, res) {
   try {
     const isLocal = process.env.NODE_ENV === 'development';
-    let secrets;
+    let secrets = {};
 
     if (isLocal) {
       secrets = {
-        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || 'Not set',
-        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || 'Not set',
-        NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'Not set',
         NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'Not set',
+        BACKEND_URL: process.env.BACKEND_URL || 'Not set',
+        AWS_REGION: process.env.AWS_REGION || 'Not set',
+        AWS_S3_BUCKET: process.env.AWS_S3_BUCKET || 'Not set',
+        SECRETS_MANAGER_SECRET_NAME: process.env.SECRETS_MANAGER_SECRET_NAME || 'Not set',
       };
     } else {
       secrets = await getSecrets();
