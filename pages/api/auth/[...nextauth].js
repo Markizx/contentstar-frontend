@@ -12,7 +12,7 @@ const baseUrl = process.env.NEXTAUTH_URL;
 export default async function auth(req, res) {
     // Отладка: выведем NEXTAUTH_URL и заголовки
     console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
-    console.log('Base URL:', baseUrl);
+    console.log('Base URL (before):', baseUrl);
     console.log('Request Headers:', req.headers);
     console.log('Host Header:', req.headers.host);
     console.log('Protocol:', req.headers['x-forwarded-proto'] || 'http');
@@ -56,13 +56,22 @@ export default async function auth(req, res) {
         secret: process.env.NEXTAUTH_SECRET,
         callbacks: {
             async redirect({ url, baseUrl }) {
-                console.log('Redirect URL:', url);
-                console.log('Base URL:', baseUrl);
-                // Всегда используем NEXTAUTH_URL
-                return process.env.NEXTAUTH_URL;
+                console.log('Callback - Redirect URL:', url);
+                console.log('Callback - Base URL:', baseUrl);
+                // Заменяем localhost:3000, если он есть
+                if (url.includes('localhost:3000')) {
+                    const correctedUrl = url.replace('http://localhost:3000', process.env.NEXTAUTH_URL);
+                    console.log('Corrected Redirect URL:', correctedUrl);
+                    return correctedUrl;
+                }
+                if (baseUrl.includes('localhost:3000')) {
+                    console.log('Base URL contains localhost:3000, correcting to NEXTAUTH_URL');
+                    return process.env.NEXTAUTH_URL;
+                }
+                return url;
             },
             async session({ session, token, user }) {
-                console.log('Session Base URL:', baseUrl);
+                console.log('Session - Base URL:', baseUrl);
                 return session;
             },
         },
@@ -73,7 +82,6 @@ export default async function auth(req, res) {
             verifyRequest: '/auth/verify-request',
             newUser: null,
         },
-        // Явно задаём baseUrl для всех операций
         baseUrl: baseUrl,
         useSecureCookies: true,
         trustHost: true,
