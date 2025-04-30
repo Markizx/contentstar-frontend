@@ -23,10 +23,14 @@ const nextConfig = {
     defaultLocale: 'en',
   },
   async rewrites() {
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000'; // Fallback URL
+    if (!backendUrl) {
+      throw new Error('BACKEND_URL is not defined in environment variables');
+    }
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.BACKEND_URL}/api/:path*`,
+        destination: `${backendUrl}/api/:path*`,
       },
     ];
   },
