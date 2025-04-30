@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  trailingSlash: true,
   env: {
     SECRETS_MANAGER_SECRET_NAME: process.env.SECRETS_MANAGER_SECRET_NAME,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
@@ -12,14 +13,23 @@ const nextConfig = {
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    BACKEND_URL: process.env.BACKEND_URL,
   },
   images: {
     domains: ['contentstar-files.s3.ap-southeast-2.amazonaws.com'],
   },
+  i18n: {
+    locales: ['en', 'ru', 'uk', 'es', 'de', 'fr'],
+    defaultLocale: 'en',
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.BACKEND_URL}/api/:path*`,
+      },
+    ];
+  },
+};
 
 module.exports = nextConfig;
-i18n: {
-  locales: ['en', 'ru', 'uk', 'es', 'de', 'fr'],
-  defaultLocale: 'en',
-},
-};
