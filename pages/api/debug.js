@@ -1,4 +1,4 @@
-import { getSecrets } from '/utils/getSecrets';
+import { getSecrets } from '/lib/getsecrets';
 
 export default async function handler(req, res) {
   try {
