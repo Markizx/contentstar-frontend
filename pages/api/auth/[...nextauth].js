@@ -20,11 +20,12 @@ export default async function auth(req, res) {
 
     // Проверяем куки и очищаем next-auth.callback-url, если он содержит localhost:3000
     const cookies = req.headers.cookie || '';
-    if (cookies.includes('next-auth.callback-url') && cookies.includes('localhost:3000')) {
-        console.log('Found invalid callback-url in cookies, clearing...');
+    console.log('Cookies before cleaning:', cookies);
+    if (cookies.includes('next-auth.callback-url')) {
+        console.log('Found next-auth.callback-url in cookies, clearing...');
         res.setHeader('Set-Cookie', [
-            'next-auth.callback-url=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly',
-            '__Secure-next-auth.callback-url=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly',
+            'next-auth.callback-url=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict',
+            '__Secure-next-auth.callback-url=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict',
         ]);
     }
 
@@ -32,7 +33,6 @@ export default async function auth(req, res) {
     const originalRedirect = res.redirect;
     res.redirect = (status, url) => {
         console.log('Redirect attempt:', status, url);
-        // Если редирект идёт на localhost:3000, заменяем на NEXTAUTH_URL
         if (url.includes('localhost:3000')) {
             const newUrl = url.replace('http://localhost:3000', process.env.NEXTAUTH_URL);
             console.log('Redirect corrected to:', newUrl);
@@ -41,7 +41,8 @@ export default async function auth(req, res) {
         return originalRedirect.call(res, status, url);
     };
 
-    return NextAuth(req, res, {
+    // Создаём конфигурацию NextAuth
+    const nextAuthConfig = {
         providers: [
             GoogleProvider({
                 clientId: process.env.GOOGLE_CLIENT_ID,
@@ -58,7 +59,6 @@ export default async function auth(req, res) {
             async redirect({ url, baseUrl }) {
                 console.log('Callback - Redirect URL:', url);
                 console.log('Callback - Base URL:', baseUrl);
-                // Заменяем localhost:3000, если он есть
                 if (url.includes('localhost:3000')) {
                     const correctedUrl = url.replace('http://localhost:3000', process.env.NEXTAUTH_URL);
                     console.log('Corrected Redirect URL:', correctedUrl);
@@ -97,5 +97,41 @@ export default async function auth(req, res) {
                 console.log('Error details:', message);
             },
         },
-    });
+    };
+
+    // Перехватываем внутренние вызовы baseUrl в NextAuth
+    const originalNextAuth = NextAuth;
+    const modifiedNextAuth = (req, res, options) => {
+        const modifiedOptions = { ...options };
+        // Перехватываем baseUrl
+        if (modifiedOptions.baseUrl?.includes('localhost:3000')) {
+            console.log('NextAuth baseUrl contains localhost:3000, correcting to NEXTAUTH_URL');
+            modifiedOptions.baseUrl = process.env.NEXTAUTH_URL;
+        }
+        // Перехватываем redirectUri в провайдерах
+        modifiedOptions.providers = modifiedOptions.providers.map(provider => {
+            if (provider.options?.authorization?.params?.redirect_uri?.includes('localhost:3000')) {
+                console.log('Provider redirect_uri contains localhost:3000, correcting to NEXTAUTH_URL');
+                provider.options.authorization.params.redirect_uri = provider.options.authorization.params.redirect_uri.replace('http://localhost:3000', process.env.NEXTAUTH_URL);
+            }
+            return provider;
+        });
+        // Перехватываем ссылки в конфигурации pages
+        if (modifiedOptions.pages) {
+            Object.keys(modifiedOptions.pages).forEach(key => {
+                if (modifiedOptions.pages[key]?.includes('localhost:3000')) {
+                    console.log(`Page ${key} contains localhost:3000, correcting to NEXTAUTH_URL`);
+                    modifiedOptions.pages[key] = modifiedOptions.pages[key].replace('http://localhost:3000', process.env.NEXTAUTH_URL);
+                }
+            });
+        }
+        // Перехватываем req.url
+        if (req.url.includes('localhost:3000')) {
+            console.log('Request URL contains localhost:3000, correcting to NEXTAUTH_URL');
+            req.url = req.url.replace('http://localhost:3000', process.env.NEXTAUTH_URL);
+        }
+        return original   return originalNextAuth(req, res, modifiedOptions);
+    };
+
+    return modifiedNextAuth(req, res, nextAuthConfig);
 }
