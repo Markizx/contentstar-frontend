@@ -1,7 +1,6 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import { MongoClient } from 'mongodb';
-import { getSecrets } from '../../../lib/getsecrets';
+import axios from 'axios';
 
 export default NextAuth({
   providers: [
@@ -13,21 +12,10 @@ export default NextAuth({
   callbacks: {
     async signIn({ user, account, profile }) {
       try {
-        const secrets = await getSecrets();
-        const client = new MongoClient(secrets.MONGODB_URI);
-        await client.connect();
-        const db = client.db('contentstar_db');
-        const existingUser = await db.collection('users').findOne({ email: user.email });
-
-        if (!existingUser) {
-          await db.collection('users').insertOne({
-            email: user.email,
-            name: user.name,
-            createdAt: new Date(),
-          });
-        }
-
-        await client.close();
+        await axios.post('http://localhost:3000/api/auth/upsert-user', {
+          email: user.email,
+          name: user.name,
+        });
         return true;
       } catch (error) {
         console.error('Error in signIn callback:', error);

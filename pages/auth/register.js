@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { MongoClient } from 'mongodb';
-import bcrypt from 'bcryptjs';
-import { getSecrets } from '../../lib/getsecrets';
+import axios from 'axios';
 
 export default function Register() {
   const { t } = useTranslation();
@@ -23,31 +21,13 @@ export default function Register() {
     setSuccess(null);
 
     try {
-      const secrets = await getSecrets();
-      const client = new MongoClient(secrets.MONGODB_URI);
-      await client.connect();
-      const db = client.db('contentstar_db');
-      const existingUser = await db.collection('users').findOne({ email });
-
-      if (existingUser) {
-        throw new Error(t('userExists'));
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-      await db.collection('users').insertOne({
-        email,
-        password: hashedPassword,
-        name,
-        createdAt: new Date(),
-      });
-
-      setSuccess(t('registrationSuccess'));
+      const response = await axios.post('/api/register', { email, password, name });
+      setSuccess(t(response.data.message));
       router.push('/auth/signin');
     } catch (err) {
-      setError(t('registrationError', { message: err.message }));
+      setError(t(err.response?.data?.error || 'registrationError', { message: err.response?.data?.message || err.message }));
     } finally {
       setLoading(false);
-      await client.close();
     }
   };
 
