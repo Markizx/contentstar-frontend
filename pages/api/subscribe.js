@@ -1,6 +1,6 @@
 import { getSession } from 'next-auth/react';
 import Stripe from 'stripe';
-import { getSecrets } from '../utils/getsecrets';
+import { getSecrets } from '../../lib/getsecrets';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

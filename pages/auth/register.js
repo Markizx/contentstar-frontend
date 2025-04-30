@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { MongoClient } from 'mongodb';
 import bcrypt from 'bcryptjs';
-import { getSecrets } from '../utils/getsecrets';
+import { getSecrets } from '../../lib/getsecrets';
 
 export default function Register() {
   const { t } = useTranslation();
