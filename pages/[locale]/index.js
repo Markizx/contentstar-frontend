@@ -45,15 +45,18 @@ export default function Home({ initialLocale }) {
       return;
     }
 
+    console.log('File before sending:', file); // Отладка
     setError(null);
     const formData = new FormData();
     formData.append('file', file);
     formData.append('prompt', 'Generate a detailed caption for this image in a professional tone');
+    console.log('FormData file:', formData.get('file')); // Отладка
 
     try {
       const res = await axios.post(`${process.env.BACKEND_URL}/api/generate`, formData, {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
+          'Content-Type': 'multipart/form-data', // Явно укажем Content-Type
         },
       });
       setResult(res.data.generatedContent);
@@ -119,7 +122,9 @@ export default function Home({ initialLocale }) {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL('image/png');
     setCapturedMedia(dataUrl);
-    cameraStream.getTracks().forEach(track => track.stop());
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+    }
     setCameraStream(null);
   };
 
@@ -133,7 +138,9 @@ export default function Home({ initialLocale }) {
       const blob = new Blob(chunks, { type: 'video/webm' });
       const url = URL.createObjectURL(blob);
       setCapturedMedia(url);
-      cameraStream.getTracks().forEach(track => track.stop());
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
       setCameraStream(null);
     };
     recorder.start();
@@ -165,6 +172,7 @@ export default function Home({ initialLocale }) {
       const res = await axios.post(`${process.env.BACKEND_URL}/api/image-to-video`, formData, {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
+          'Content-Type': 'multipart/form-data',
         },
       });
       setResult(res.data.videoUrl);
@@ -195,6 +203,7 @@ export default function Home({ initialLocale }) {
       const res = await axios.post(`${process.env.BACKEND_URL}/api/generate`, formData, {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
+          'Content-Type': 'multipart/form-data',
         },
       });
       setResult(res.data.generatedContent);
